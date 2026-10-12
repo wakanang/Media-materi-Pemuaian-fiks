@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAB IPA INTERAKTIF — PEMUAIAN ZAT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #f97316 100%); }
+        .hero-pattern { background-image: radial-gradient(#3b82f6 1px, transparent 1px); background-size: 24px 24px; }
+        @keyframes pulse-slow { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .animate-pulse-slow { animation: pulse-slow 3s infinite ease-in-out; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <div id="identity-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 border-4 border-blue-500 animate-pulse-slow">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <h2 class="text-2xl font-extrabold text-blue-900">Selamat Datang di Lab IPA!</h2>
+                <p class="text-sm text-slate-500 mt-1">Masukkan identitasmu sebelum memulai petualangan pemuaian zat.</p>
+            </div>
+            <form id="identity-form" onsubmit="saveIdentity(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Nama Lengkap Siswa *</label>
+                    <input type="text" id="student-name" required placeholder="Contoh: Budi Santoso" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Kelas *</label>
+                    <input type="text" id="student-class" required placeholder="Contoh: VII A" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Nomor Absen (Opsional)</label>
+                    <input type="number" id="student-number" placeholder="Contoh: 12" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-sm">
+                </div>
+                <button type="submit" class="w-full py-4 bg-gradient-to-r from-blue-600 to-orange-500 hover:from-blue-700 hover:to-orange-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition transform hover:-translate-y-0.5 text-base flex items-center justify-center gap-2">
+                    <span>Mulai Pembelajaran</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <header class="bg-white sticky top-0 z-40 shadow-sm border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-xl shadow-md shadow-blue-500/20">
+                    <i class="fa-solid fa-flask-vial"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-blue-900 text-base sm:text-lg tracking-tight">LAB IPA INTERAKTIF</h1>
+                    <p class="text-xs font-semibold text-orange-600">Topik: Pemuaian Zat — Kelas 7</p>
+                </div>
+            </div>
+            
+            <nav class="hidden lg:flex items-center gap-1">
+                <button onclick="switchTab('home')" class="nav-btn px-4 py-2 rounded-xl text-sm font-bold text-blue-600 bg-blue-50 transition" data-target="home"><i class="fa-solid fa-house mr-1.5"></i> Beranda</button>
+                <button onclick="switchTab('materi')" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition" data-target="materi"><i class="fa-solid fa-book-open mr-1.5"></i> Materi</button>
+                <button onclick="switchTab('deep')" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition" data-target="deep"><i class="fa-solid fa-brain mr-1.5"></i> Pendalaman</button>
+                <button onclick="switchTab('lab')" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition" data-target="lab"><i class="fa-solid fa-atom mr-1.5"></i> Lab Virtual</button>
+                <button onclick="switchTab('games')" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition" data-target="games"><i class="fa-solid fa-gamepad mr-1.5"></i> Game</button>
+                <button onclick="switchTab('quiz')" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition" data-target="quiz"><i class="fa-solid fa-clipboard-question mr-1.5"></i> Kuis</button>
+                <button onclick="switchTab('lkpd')" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition" data-target="lkpd"><i class="fa-solid fa-file-lines mr-1.5"></i> LKPD</button>
+                <button onclick="switchTab('summary')" class="nav-btn px-4 py-2 rounded-xl text-sm font-semibold text-orange-600 bg-orange-50 hover:bg-orange-100 transition" data-target="summary"><i class="fa-solid fa-award mr-1.5"></i> Hasil Belajar</button>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <div id="student-badge" class="hidden sm:flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full text-xs font-bold text-slate-700 border border-slate-200">
+                    <i class="fa-solid fa-user-circle text-blue-600"></i>
+                    <span id="display-name">Siswa</span>
+                </div>
+                <button onclick="toggleMobileMenu()" class="lg:hidden p-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-4 space-y-1">
+            <button onclick="switchTab('home'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-bold text-blue-600 bg-blue-50"><i class="fa-solid fa-house mr-2"></i> Beranda</button>
+            <button onclick="switchTab('materi'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100"><i class="fa-solid fa-book-open mr-2"></i> Materi</button>
+            <button onclick="switchTab('deep'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100"><i class="fa-solid fa-brain mr-2"></i> Pendalaman</button>
+            <button onclick="switchTab('lab'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100"><i class="fa-solid fa-atom mr-2"></i> Lab Virtual</button>
+            <button onclick="switchTab('games'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100"><i class="fa-solid fa-gamepad mr-2"></i> Game</button>
+            <button onclick="switchTab('quiz'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100"><i class="fa-solid fa-clipboard-question mr-2"></i> Kuis</button>
+            <button onclick="switchTab('lkpd'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100"><i class="fa-solid fa-file-lines mr-2"></i> LKPD</button>
+            <button onclick="switchTab('summary'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold text-orange-600 bg-orange-50"><i class="fa-solid fa-award mr-2"></i> Hasil Belajar</button>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- HOME TAB -->
+        <section id="tab-home" class="tab-content space-y-10">
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white p-8 sm:p-12 shadow-2xl hero-pattern">
+                <div class="relative z-10 max-w-2xl">
+                    <span class="px-3.5 py-1.5 rounded-full bg-orange-500/20 border border-orange-400/30 text-orange-300 text-xs font-bold uppercase tracking-widest inline-block mb-4">Kurikulum Merdeka • IPA Kelas 7</span>
+                    <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight mb-4">“MENGAPA BENDA BISA MEMUAI?”</h1>
+                    <p class="text-blue-100 text-base sm:text-lg mb-8 leading-relaxed">Jelajahi dunia pemuaian melalui eksperimen virtual, tantangan sains, dan permainan interaktif yang seru!</p>
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="switchTab('materi')" class="px-6.5 py-3.5 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-2xl shadow-lg shadow-orange-500/30 transition transform hover:-translate-y-0.5 flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-book-open"></i> Pelajari Materi
+                        </button>
+                        <button onclick="switchTab('lab')" class="px-6.5 py-3.5 bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold rounded-2xl backdrop-blur-md transition transform hover:-translate-y-0.5 flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-atom"></i> Laboratorium Virtual
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Action Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div onclick="switchTab('lab')" class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-blue-300 transition cursor-pointer group">
+                    <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition">
+                        <i class="fa-solid fa-flask"></i>
+                    </div>
+                    <h3 class="font-extrabold text-lg text-slate-900 mb-2">Laboratorium Virtual</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">Simulasikan pemuaian batang logam dengan berbagai jenis bahan, suhu, dan ukur perubahan panjang secara akurat.</p>
+                </div>
+                <div onclick="switchTab('games')" class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-orange-300 transition cursor-pointer group">
+                    <div class="w-14 h-14 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition">
+                        <i class="fa-solid fa-gamepad"></i>
+                    </div>
+                    <h3 class="font-extrabold text-lg text-slate-900 mb-2">Game Edukasi</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">Uji pemahamanmu lewat permainan pasangkan fenomena, detektif pemuaian, dan tantangan benar/salah berhadiah skor!</p>
+                </div>
+                <div onclick="switchTab('quiz')" class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-indigo-300 transition cursor-pointer group">
+                    <div class="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition">
+                        <i class="fa-solid fa-clipboard-question"></i>
+                    </div>
+                    <h3 class="font-extrabold text-lg text-slate-900 mb-2">Kuis Evaluasi</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">Kerjakan 10 soal pilihan ganda pilihan HOTS dan kontekstual, dapatkan nilai otomatis serta pembahasan lengkap.</p>
+                </div>
+            </div>
+
+            <!-- Learning Objectives Section -->
+            <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <h2 class="text-xl font-extrabold text-slate-900">Tujuan Pembelajaran</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex items-start gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                        <span class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</span>
+                        <p class="text-sm font-medium text-slate-700">Menjelaskan pengertian pemuaian benda akibat kenaikan suhu.</p>
+                    </div>
+                    <div class="flex items-start gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                        <span class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</span>
+                        <p class="text-sm font-medium text-slate-700">Mengidentifikasi pemuaian zat padat, zat cair, dan zat gas.</p>
+                    </div>
+                    <div class="flex items-start gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                        <span class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</span>
+                        <p class="text-sm font-medium text-slate-700">Membedakan pemuaian panjang, luas, dan volume pada zat padat.</p>
+                    </div>
+                    <div class="flex items-start gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                        <span class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">4</span>
+                        <p class="text-sm font-medium text-slate-700">Menganalisis pengaruh perubahan suhu terhadap ukuran benda.</p>
+                    </div>
+                    <div class="flex items-start gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                        <span class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">5</span>
+                        <p class="text-sm font-medium text-slate-700">Menjelaskan penerapan pemuaian dalam kehidupan sehari-hari.</p>
+                    </div>
+                    <div class="flex items-start gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                        <span class="w-7 h-7 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">6</span>
+                        <p class="text-sm font-medium text-slate-700">Melakukan eksperimen virtual dan menyimpulkan konsep berdasarkan bukti.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MATERI TAB -->
+        <section id="tab-materi" class="tab-content hidden space-y-8">
+            <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+                <div class="border-b border-slate-200 pb-4 mb-6">
+                    <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Materi Pembelajaran A</span>
+                    <h2 class="text-2xl font-extrabold text-slate-900 mt-1">1. Pengertian Pemuaian & Animasi Partikel</h2>
+                </div>
+                <p class="text-slate-600 text-base leading-relaxed mb-6">
+                    <strong>Pemuaian</strong> adalah bertambahnya ukuran suatu benda (panjang, luas, atau volume) akibat kenaikan suhu (panas). Ketika zat dipanaskan, energi kinetik partikelnya bertambah sehingga partikel bergetar lebih kuat dan saling menjauh, menyebabkan ukuran benda bertambah besar.
+                </p>
+
+                <!-- Particle simulation interactive card -->
+                <div class="bg-slate-900 rounded-2xl p-6 text-white mb-6">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h4 class="font-bold text-lg text-blue-400">Simulasi Partikel Zat</h4>
+                            <p class="text-xs text-slate-400">Tekan tombol di bawah untuk melihat perbedaan partikel sebelum dan sesudah dipanaskan.</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="setParticleState('cold')" id="btn-cold" class="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold transition shadow-lg">Sebelum Dipanaskan (Dingin)</button>
+                            <button onclick="setParticleState('hot')" id="btn-hot" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold transition hover:bg-slate-700">Sesudah Dipanaskan (Panas)</button>
+                        </div>
+                    </div>
+                    <div id="particle-container" class="h-64 bg-slate-950 rounded-xl border border-slate-800 relative flex items-center justify-center overflow-hidden">
+                        <!-- Dynamic particles rendered by JS -->
+                    </div>
+                    <div id="particle-desc" class="mt-4 text-center text-sm text-slate-300 font-medium">
+                        Suhu rendah: Partikel bergetar rapat dan teratur di dalam wadah/benda.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zat Padat -->
+            <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-200 pb-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Materi Pembelajaran B</span>
+                    <h2 class="text-2xl font-extrabold text-slate-900 mt-1">2. Pemuaian Zat Padat</h2>
+                </div>
+                <p class="text-slate-600 text-base leading-relaxed">
+                    Zat padat dapat mengalami pemuaian panjang, pemuaian luas, dan pemuaian volume.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-bold mb-3"><i class="fa-solid fa-arrows-left-right"></i></div>
+                        <h4 class="font-bold text-slate-900 mb-2">Pemuaian Panjang</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed mb-4">Terjadi pada benda yang ukurannya jauh lebih panjang dibanding lebar dan tebalnya (contoh: kawat, batang besi, kabel listrik).</p>
+                        <div class="bg-blue-50 p-3 rounded-xl text-xs font-mono text-blue-900">
+                            ΔL = L₀ × α × ΔT
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-bold mb-3"><i class="fa-solid fa-expand"></i></div>
+                        <h4 class="font-bold text-slate-900 mb-2">Pemuaian Luas</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed mb-4">Terjadi pada benda yang memiliki ukuran panjang dan lebar (bidang/pelat logam tipis).</p>
+                        <div class="bg-blue-50 p-3 rounded-xl text-xs font-mono text-blue-900">
+                            ΔA = A₀ × β × ΔT <br>(β ≈ 2α)
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-bold mb-3"><i class="fa-solid fa-cube"></i></div>
+                        <h4 class="font-bold text-slate-900 mb-2">Pemuaian Volume</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed mb-4">Terjadi pada benda berdimensi tiga yang memiliki panjang, lebar, dan tinggi (contoh: kubus besi, bola pejal).</p>
+                        <div class="bg-blue-50 p-3 rounded-xl text-xs font-mono text-blue-900">
+                            ΔV = V₀ × γ × ΔT <br>(γ ≈ 3α)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Explanation of symbols -->
+                <div class="bg-amber-50 border border-amber-200 p-6 rounded-2xl text-amber-900 text-sm space-y-2">
+                    <h5 class="font-bold"><i class="fa-solid fa-circle-info mr-2"></i> Keterangan Rumus & Simbol:</h5>
+                    <ul class="list-disc pl-5 space-y-1 text-xs sm:text-sm">
+                        <li><strong>L₀, A₀, V₀</strong> = Panjang, luas, atau volume awal benda</li>
+                        <li><strong>ΔL, ΔA, ΔV</strong> = Pertambahan panjang, luas, atau volume</li>
+                        <li><strong>α (alfa), β (beta), γ (gamma)</strong> = Koefisien muai panjang, luas, dan volume</li>
+                        <li><strong>ΔT</strong> = Perubahan suhu (Suhu akhir - Suhu awal, dalam °C atau Kelvin)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Zat Cair & Gas -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Materi C</span>
+                    <h3 class="text-xl font-extrabold text-slate-900">3. Pemuaian Zat Cair</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">
+                        Zat cair hanya mengalami <strong>pemuaian volume</strong> karena bentuknya mengikuti wadah. Ketika dipanaskan, volume cairan akan bertambah sehingga permukaannya naik (seperti pada termometer raksa/alkohol). Ingat bahwa wadah penyimpanan zat cair juga ikut memuai!
+                    </p>
+                </div>
+                <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Materi D</span>
+                    <h3 class="text-xl font-extrabold text-slate-900">4. Pemuaian Gas</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">
+                        Gas dapat mengalami pemuaian volume maupun tekanan yang sangat besar karena jarak antar partikel gas sangat renggang dan mudah bergerak bebas. Contohnya adalah balon yang diletakkan di tempat panas akan mengembang atau bahkan meletus.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Daily Life Applications Interactive Cards -->
+            <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-200 pb-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-orange-600">Materi E</span>
+                    <h2 class="text-2xl font-extrabold text-slate-900 mt-1">5. Penerapan Pemuaian dalam Kehidupan Sehari-hari</h2>
+                    <p class="text-slate-600 text-sm mt-1">Klik kartu di bawah untuk melihat penjelasan ilmiah dan manfaatnya!</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="app-cards-grid">
+                    <!-- Cards injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- DEEP LEARNING TAB -->
+        <section id="tab-deep" class="tab-content hidden space-y-8">
+            <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-200 pb-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Pembelajaran Mendalam</span>
+                    <h2 class="text-2xl font-extrabold text-slate-900 mt-1">Eksplorasi & Refleksi Konsep</h2>
+                </div>
+
+                <!-- A. MEMAHAMI -->
+                <div class="bg-blue-50 border border-blue-200 p-6 rounded-2xl space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">A</div>
+                        <h3 class="font-extrabold text-blue-900 text-lg">MEMAHAMI</h3>
+                    </div>
+                    <p class="text-slate-700 text-sm font-semibold">Pertanyaan Pemantik:</p>
+                    <p class="text-slate-800 text-base font-bold italic">“Mengapa rel kereta api dibuat dengan celah sambungan di antara batang rel?”</p>
+                    <div class="space-y-2 pt-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600">Pilih jawaban yang paling tepat:</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-3 p-3 bg-white rounded-xl border border-blue-100 cursor-pointer hover:bg-blue-100/50 transition">
+                                <input type="radio" name="pemantik-ans" value="a" class="text-blue-600">
+                                <span class="text-sm text-slate-700">Agar kereta api bisa berjalan lebih cepat tanpa hambatan suara.</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 bg-white rounded-xl border border-blue-100 cursor-pointer hover:bg-blue-100/50 transition">
+                                <input type="radio" name="pemantik-ans" value="b" class="text-blue-600">
+                                <span class="text-sm text-slate-700">Memberikan ruang bagi rel besi untuk memuai saat cuaca panas sehingga tidak melengkung.</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 bg-white rounded-xl border border-blue-100 cursor-pointer hover:bg-blue-100/50 transition">
+                                <input type="radio" name="pemantik-ans" value="c" class="text-blue-600">
+                                <span class="text-sm text-slate-700">Menghemat bahan baku pembuatan besi rel kereta api.</span>
+                            </label>
+                        </div>
+                        <button onclick="checkPemantik()" class="mt-3 px-5 py-2.5 bg-blue-600 text-white font-bold rounded-xl text-xs hover:bg-blue-700 transition">Periksa Jawaban</button>
+                        <div id="pemantik-feedback" class="mt-2 text-xs font-semibold"></div>
+                    </div>
+                </div>
+
+                <!-- B. MENGAPLIKASI -->
+                <div class="bg-orange-50 border border-orange-200 p-6 rounded-2xl space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-orange-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">B</div>
+                        <h3 class="font-extrabold text-orange-900 text-lg">MENGAPLIKASI</h3>
+                    </div>
+                    <p class="text-slate-700 text-sm font-semibold">Masalah Kontekstual:</p>
+                    <p class="text-slate-800 text-base font-bold">“Pada siang hari yang panas, jembatan baja mengalami kenaikan suhu yang tinggi. Mengapa struktur jembatan perlu dirancang dengan memperhitungkan pemuaian?”</p>
+                    <textarea id="app-answer" rows="3" placeholder="Tuliskan analisis dan alasan ilmiahmu di sini..." class="w-full p-4 rounded-xl border border-orange-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none text-sm bg-white"></textarea>
+                    <button onclick="saveApplicationAnswer()" class="px-5 py-2.5 bg-orange-600 text-white font-bold rounded-xl text-xs hover:bg-orange-700 transition">Simpan & Periksa Analisis</button>
+                    <div id="app-feedback" class="text-xs font-semibold"></div>
+                </div>
+
+                <!-- C. MEREFLEKSI -->
+                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-indigo-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">C</div>
+                        <h3 class="font-extrabold text-indigo-900 text-lg">MEREFLEKSI</h3>
+                    </div>
+                    <p class="text-slate-700 text-sm font-semibold">Renungkan dan catat pengalaman belajarmu:</p>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">1. Apa hal baru yang saya pelajari hari ini?</label>
+                            <input type="text" id="ref-1" class="w-full p-3 bg-white rounded-xl border border-indigo-200 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">2. Fenomena pemuaian apa yang saya temukan di lingkungan sekitar?</label>
+                            <input type="text" id="ref-2" class="w-full p-3 bg-white rounded-xl border border-indigo-200 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">3. Bagian mana yang masih terasa sulit dipahami?</label>
+                            <input type="text" id="ref-3" class="w-full p-3 bg-white rounded-xl border border-indigo-200 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">4. Bagaimana konsep pemuaian membantu manusia merancang benda yang aman?</label>
+                            <input type="text" id="ref-4" class="w-full p-3 bg-white rounded-xl border border-indigo-200 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <button onclick="saveReflection()" class="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl text-xs hover:bg-indigo-700 transition">Simpan Catatan Refleksi</button>
+                        <div id="ref-feedback" class="text-xs font-semibold text-emerald-600"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LAB VIRTUAL TAB -->
+        <section id="tab-lab" class="tab-content hidden space-y-8">
+            <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-200 pb-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Laboratorium Virtual IPA</span>
+                    <h2 class="text-2xl font-extrabold text-slate-900 mt-1">Eksperimen Pemuaian Batang Logam</h2>
+                    <p class="text-slate-600 text-sm mt-1">Uji coba pengaruh jenis bahan dan perubahan suhu terhadap pertambahan panjang logam secara real-time.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Controls -->
+                    <div class="space-y-4 bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <h3 class="font-bold text-slate-900 text-sm uppercase tracking-wider">Kontrol Simulasi</h3>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Pilih Bahan Logam</label>
+                            <select id="lab-material" onchange="updateLabSimulation()" class="w-full p-3 bg-white rounded-xl border border-slate-300 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none">
+                                <option value="iron">Besi (α = 0.000012 /°C)</option>
+                                <option value="aluminum">Aluminium (α = 0.000024 /°C)</option>
+                                <option value="copper">Tembaga (α = 0.000017 /°C)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Panjang Awal (L₀) dalam meter</label>
+                            <input type="number" id="lab-l0" value="1.0" step="0.1" min="0.5" max="5.0" oninput="updateLabSimulation()" class="w-full p-3 bg-white rounded-xl border border-slate-300 text-sm font-semibold text-slate-800 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Suhu Awal (T₁) dalam °C</label>
+                            <input type="number" id="lab-t1" value="25" min="0" max="100" oninput="updateLabSimulation()" class="w-full p-3 bg-white rounded-xl border border-slate-300 text-sm font-semibold text-slate-800 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Suhu Akhir (T₂) dalam °C</label>
+                            <input type="number" id="lab-t2" value="100" min="20" max="500" oninput="updateLabSimulation()" class="w-full p-3 bg-white rounded-xl border border-slate-300 text-sm font-semibold text-slate-800 outline-none">
+                        </div>
+                        <div class="flex gap-2 pt-2">
+                            <button onclick="resetLab()" class="flex-1 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs transition">Reset</button>
+                            <button onclick="saveLabObservation()" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition">Simpan Hasil</button>
+                        </div>
+                    </div>
+
+                    <!-- Visual & Calculation Output -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-slate-900 rounded-2xl p-6 text-white">
+                            <h4 class="font-bold text-sm text-blue-400 mb-4 flex items-center justify-between">
+                                <span>Visualisasi Batang Logam</span>
+                                <span id="lab-temp-display" class="px-3 py-1 bg-red-500/20 text-red-300 text-xs rounded-full border border-red-500/30">Suhu: 100 °C</span>
+                            </h4>
+                            <div class="h-40 bg-slate-950 rounded-xl border border-slate-800 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+                                <div class="w-full flex items-center justify-center">
+                                    <div id="metal-bar-visual" class="h-8 bg-gradient-to-r from-slate-400 via-slate-300 to-slate-400 rounded-md transition-all duration-300 shadow-lg flex items-center justify-center text-xs font-extrabold text-slate-900" style="width: 60%;">
+                                        Besi
+                                    </div>
+                                </div>
+                                <div class="absolute bottom-3 text-xs text-slate-400 flex justify-between w-full px-6">
+                                    <span>0 m</span>
+                                    <span id="visual-length-label">Panjang Akhir: 1.0009 m</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Calculation Results Cards -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-center">
+                                <span class="text-xs font-bold text-slate-500 block mb-1">Perubahan Suhu (ΔT)</span>
+                                <span id="res-dt" class="text-lg font-extrabold text-blue-600">75 °C</span>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-center">
+                                <span class="text-xs font-bold text-slate-500 block mb-1">Koefisien (α)</span>
+                                <span id="res-alpha" class="text-lg font-extrabold text-blue-600">0.000012</span>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-center">
+                                <span class="text-xs font-bold text-slate-500 block mb-1">Pertambahan (ΔL)</span>
+                                <span id="res-deltal" class="text-lg font-extrabold text-orange-600">0.0009 m</span>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-center">
+                                <span class="text-xs font-bold text-slate-500 block mb-1">Panjang Akhir (L)</span>
+                                <span id="res-final" class="text-lg font-extrabold text-emerald-600">1.0009 m</span>
+                            </div>
+                        </div>
+
+                        <!-- Observation Table -->
+                        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 font-bold text-sm text-slate-800">
+                                Tabel Hasil Pengamatan Eksperimen Virtual
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-slate-100 text-slate-700 uppercase">
+                                        <tr>
+                                            <th class="p-3">Bahan</th>
+                                            <th class="p-3">L₀ (m)</th>
+                                            <th class="p-3">T₁ (°C)</th>
+                                            <th class="p-3">T₂ (°C)</th>
+                                            <th class="p-3">ΔT (°C)</th>
+                                            <th class="p-3">ΔL (m)</th>
+                                            <th class="p-3">L Akhir (m)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="observation-table-body" class="divide-y divide-slate-200 text-slate-600">
+                                        <tr>
+                                            <td colspan="7" class="p-4 text-center text-slate-400 italic">Belum ada data disimpan. Tekan "Simpan Hasil" untuk mencatat.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GAMES TAB -->
+        <section id="tab-games" class="tab-content hidden space-y-8">
+            <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-200 pb-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-orange-600">Zona Permainan Edukatif</span>
+                    <h2 class="text-2xl font-extrabold text-slate-900 mt-1">Asah Pemahaman dengan Game Seru</h2>
+                </div>
+
+                <!-- Game Selector Tabs -->
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="switchGame(1)" id="g-tab-1" class="px-5 py-2.5 rounded-xl font-bold text-xs bg-orange-600 text-white shadow-md">Game 1: Pasangkan Fenomena</button>
+                    <button onclick="switchGame(2)" id="g-tab-2" class="px-5 py-2.5 rounded-xl font-bold text-xs bg-slate-100 text-slate-700 hover:bg-slate-200">Game 2: Detektif Pemuaian</button>
+                    <button onclick="switchGame(3)" id="g-tab-3" class="px-5 py-2.5 rounded-xl font-bold text-xs bg-slate-100 text-slate-700 hover:bg-slate-200">Game 3: Benar / Salah</button>
+                </div>
+
+                <!-- Game 1: Match Phenomenon -->
+                <div id="game-1-container" class="game-panel space-y-6">
+                    <div class="bg-orange-50 p-6 rounded-2xl border border-orange-200">
+                        <h3 class="font-bold text-orange-900 text-base mb-1">Game 1 — Pasangkan Fenomena dengan Konsep</h3>
+                        <p class="text-slate-600 text-xs">Pilih konsep pemuaian yang paling sesuai untuk setiap fenomena sehari-hari!</p>
+                    </div>
+                    <div class="space-y-4" id="g1-questions">
+                        <!-- Injected by JS -->
+                    </div>
+                    <button onclick="submitGame1()" class="px-6 py-3 bg-orange-600 text-white font-bold rounded-xl text-xs hover:bg-orange-700 shadow-lg">Periksa Skor Game 1</button>
+                    <div id="g1-result" class="text-sm font-bold"></div>
+                </div>
+
+                <!-- Game 2: Detective -->
+                <div id="game-2-container" class="game-panel hidden space-y-6">
+                    <div class="bg-orange-50 p-6 rounded-2xl border border-orange-200">
+                        <h3 class="font-bold text-orange-900 text-base mb-1">Game 2 — Detektif Pemuaian</h3>
+                        <p class="text-slate-600 text-xs">Analisis kasus penyelidikan di bawah ini dan tentukan kesimpulan yang benar.</p>
+                    </div>
+                    <div class="space-y-6" id="g2-questions">
+                        <!-- Injected by JS -->
+                    </div>
+                    <button onclick="submitGame2()" class="px-6 py-3 bg-orange-600 text-white font-bold rounded-xl text-xs hover:bg-orange-700 shadow-lg">Periksa Skor Game 2</button>
+                    <div id="g2-result" class="text-sm font-bold"></div>
+                </div>
+
+                <!-- Game 3: True / False -->
+                <div id="game-3-container" class="game-panel hidden space-y-6">
+                    <div class="bg-orange-50 p-6 rounded-2xl border border-orange-200">
+                        <h3 class="font-bold text-orange-900 text-base mb-1">Game 3 — Benar atau Salah Cepat</h3>
+                        <p class="text-slate-600 text-xs">Tentukan apakah pernyataan berikut Benar atau Salah.</p>
+                    </div>
+                    <div class="space-y-4" id="g3-questions">
+                        <!-- Injected by JS -->
+                    </div>
+                    <button onclick="submitGame3()" class="px-6 py-3 bg-orange-600 text-white font-bold rounded-xl text-xs hover:bg-orange-700 shadow-lg">Periksa Skor Game 3</button>
+                    <div id="g3-result" class="text-sm font-bold"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUIZ TAB -->
+        <section id="tab-quiz" class="tab-content hidden space-y-8">
+            <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-200 pb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Evaluasi Belajar Mandiri</span>
+                        <h2 class="text-2xl font-extrabold text-slate-900 mt-1">Kuis Pemuaian Zat (10 Soal)</h2>
+                    </div>
+                    <div id="quiz-progress-badge" class="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-2xl text-xs font-bold border border-indigo-100">
+                        Soal 1 dari 10
+                    </div>
+                </div>
+
+                <!-- Quiz Start Screen -->
+                <div id="quiz-start-screen" class="text-center py-12 space-y-6">
+                    <div class="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-inner">
+                        <i class="fa-solid fa-clipboard-question"></i>
+                    </div>
+                    <div class="max-w-md mx-auto space-y-2">
+                        <h3 class="text-xl font-bold text-slate-900">Siap Mengerjakan Kuis Evaluasi?</h3>
+                        <p class="text-slate-600 text-sm">Kuis terdiri dari 10 soal pilihan ganda meliputi konsep pemuaian zat padat, cair, gas, soal kontekstual, dan analisis grafik/tabel.</p>
+                    </div>
+                    <button onclick="startQuiz()" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/30 transition text-sm">
+                        Mulai Kuis Sekarang
+                    </button>
+                </div>
+
+                <!-- Quiz Question Active Screen -->
+                <div id="quiz-question-screen" class="hidden space-y-6">
+                    <div id="quiz-question-text" class="text-lg font-bold text-slate-900 leading-relaxed bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <!-- Question text -->
+                    </div>
+                    <div class="space-y-3" id="quiz-options-container">
+                        <!-- Options injected by JS -->
+                    </div>
+                    <div class="flex items-center justify-between pt-4 border-t border-slate-200">
+                        <button onclick="prevQuizQuestion()" id="btn-prev-quiz" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs transition disabled:opacity-50">Soal Sebelumnya</button>
+                        <button onclick="nextQuizQuestion()" id="btn-next-quiz" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition">Soal Berikutnya</button>
+                    </div>
+                </div>
+
+                <!-- Quiz Result Screen -->
+                <div id="quiz-result-screen" class="hidden space-y-6 text-center py-8">
+                    <div class="w-24 h-24 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-4xl shadow-inner mb-4">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <h3 class="text-2xl font-extrabold text-slate-900">Kuis Selesai!</h3>
+                    <div class="max-w-xs mx-auto bg-slate-50 p-6 rounded-3xl border border-slate-200 space-y-2">
+                        <span class="text-xs font-bold text-slate-500 uppercase">Nilai Akhir Anda</span>
+                        <div id="final-score-display" class="text-5xl font-extrabold text-indigo-600">85</div>
+                        <p id="score-detail-text" class="text-xs text-slate-600 pt-2">Benar: 8 | Salah: 2</p>
+                    </div>
+                    <div class="flex flex-wrap justify-center gap-4 pt-4">
+                        <button onclick="reviewQuiz()" class="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs transition"><i class="fa-solid fa-book-open mr-2"></i> Lihat Pembahasan</button>
+                        <button onclick="retakeQuiz()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition"><i class="fa-solid fa-rotate-right mr-2"></i> Ulangi Kuis</button>
+                        <button onclick="switchTab('summary')" class="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-xs transition"><i class="fa-solid fa-paper-plane mr-2"></i> Kirim ke WhatsApp Guru</button>
+                    </div>
+                </div>
+
+                <!-- Quiz Review Screen -->
+                <div id="quiz-review-screen" class="hidden space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-extrabold text-lg text-slate-900">Pembahasan Soal Kuis</h3>
+                        <button onclick="backToQuizResult()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">Kembali ke Skor</button>
+                    </div>
+                    <div class="space-y-6" id="quiz-review-container">
+                        <!-- Review injected by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LKPD TAB -->
+        <section id="tab-lkpd" class="tab-content hidden space-y-8">
+            <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-200 pb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Lembar Kerja Peserta Didik Digital</span>
+                        <h2 class="text-2xl font-extrabold text-slate-900 mt-1">Investigasi Pemuaian dalam Kehidupan Sehari-hari</h2>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="saveLKPD()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition"><i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan LKPD</button>
+                        <button onclick="window.print()" class="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs transition"><i class="fa-solid fa-print mr-1.5"></i> Cetak / PDF</button>
+                    </div>
+                </div>
+
+                <!-- LKPD Form Content -->
+                <div class="space-y-6 text-sm">
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-3">
+                        <h3 class="font-bold text-slate-900 text-base">Identitas Kegiatan</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Siswa:</label>
+                                <input type="text" id="lkpd-name" readonly class="w-full p-2.5 bg-white rounded-xl border border-slate-300 font-bold text-slate-800">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Kelas:</label>
+                                <input type="text" id="lkpd-class" readonly class="w-full p-2.5 bg-white rounded-xl border border-slate-300 font-bold text-slate-800">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h4 class="font-bold text-slate-900">1. Tujuan Kegiatan</h4>
+                        <p class="text-slate-600">Melalui eksperimen virtual dan analisis literatur, siswa dapat menyelidiki pengaruh perubahan suhu terhadap pemuaian zat padat, cair, dan gas serta menjelaskan penerapannya dalam teknologi.</p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h4 class="font-bold text-slate-900">2. Pertanyaan Pemantik</h4>
+                        <p class="text-slate-600 italic">"Apa yang terjadi pada jembatan besi ketika suhu udara sangat panas di siang hari dan sangat dingin di malam hari?"</p>
+                        <textarea id="lkpd-q1" rows="2" placeholder="Tuliskan hipotesis awalmu..." class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h4 class="font-bold text-slate-900">3. Hasil Analisis Eksperimen Virtual</h4>
+                        <p class="text-slate-600">Rangkum temuan dari simulasi pemuaian logam yang telah kamu lakukan:</p>
+                        <textarea id="lkpd-q2" rows="3" placeholder="Tuliskan kesimpulan data dari lab virtual..." class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h4 class="font-bold text-slate-900">4. Kesimpulan Akhir</h4>
+                        <textarea id="lkpd-conclusion" rows="3" placeholder="Tuliskan kesimpulan lengkap tentang pemuaian zat..." class="w-full p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SUMMARY & WHATSAPP TAB -->
+        <section id="tab-summary" class="tab-content hidden space-y-8">
+            <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-200 pb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-orange-600">Laporan Resmi Siswa</span>
+                        <h2 class="text-2xl font-extrabold text-slate-900 mt-1">HASIL BELAJAR SAYA</h2>
+                    </div>
+                    <button onclick="refreshSummaryData()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold"><i class="fa-solid fa-rotate mr-1.5"></i> Perbarui Data</button>
+                </div>
+
+                <!-- Dashboard Summary Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100">
+                        <span class="text-xs font-bold text-blue-600 uppercase block mb-1">Identitas Siswa</span>
+                        <h4 id="sum-name" class="font-extrabold text-slate-900 text-lg">Budi Santoso</h4>
+                        <p id="sum-class" class="text-xs text-slate-600">Kelas: VII A</p>
+                    </div>
+                    <div class="bg-indigo-50 p-5 rounded-2xl border border-indigo-100">
+                        <span class="text-xs font-bold text-indigo-600 uppercase block mb-1">Nilai Kuis Akhir</span>
+                        <h4 id="sum-quiz-score" class="font-extrabold text-indigo-900 text-2xl">Belum Dikerjakan</h4>
+                        <p id="sum-quiz-detail" class="text-xs text-slate-600">0 benar dari 10 soal</p>
+                    </div>
+                    <div class="bg-orange-50 p-5 rounded-2xl border border-orange-100">
+                        <span class="text-xs font-bold text-orange-600 uppercase block mb-1">Skor Game Edukasi</span>
+                        <h4 id="sum-game-score" class="font-extrabold text-orange-900 text-lg">G1: 0 | G2: 0 | G3: 0</h4>
+                        <p class="text-xs text-slate-600">Total Permainan Selesai</p>
+                    </div>
+                    <div class="bg-emerald-50 p-5 rounded-2xl border border-emerald-100">
+                        <span class="text-xs font-bold text-emerald-600 uppercase block mb-1">Status Eksperimen</span>
+                        <h4 id="sum-lab-status" class="font-extrabold text-emerald-900 text-base">Tercatat</h4>
+                        <p id="sum-lab-detail" class="text-xs text-slate-600">Bahan & Delta L aktif</p>
+                    </div>
+                </div>
+
+                <!-- Detailed Text Preview for WhatsApp -->
+                <div class="space-y-3">
+                    <h3 class="font-bold text-slate-900 text-sm">Pratinjau Pesan Laporan WhatsApp Guru (Nomor: 6281373363236)</h3>
+                    <div id="whatsapp-preview-box" class="bg-slate-950 text-emerald-400 p-6 rounded-2xl font-mono text-xs whitespace-pre-wrap leading-relaxed border border-slate-800 shadow-inner">
+                        Memuat pratinjau laporan...
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap gap-4 pt-4">
+                    <button onclick="sendToWhatsAppGuru()" class="flex-1 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/30 transition text-sm flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-lg"></i>
+                        <span>KIRIM HASIL BELAJAR KE WHATSAPP GURU</span>
+                    </button>
+                    <button onclick="window.print()" class="px-6 py-4 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-2xl text-xs transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-print"></i>
+                        <span>Cetak Hasil</span>
+                    </button>
+                    <button onclick="switchTab('quiz')" class="px-6 py-4 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-2xl text-xs transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Ulangi Kuis</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 mt-16 py-8 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 space-y-2">
+            <p class="font-bold text-slate-700">LAB IPA INTERAKTIF — PEMUAIAN ZAT KELAS 7</p>
+            <p>Dikembangkan untuk Pembelajaran Mendalam Kurikulum Merdeka • Terintegrasi WhatsApp Guru: <strong>081373363236</strong></p>
+        </div>
+    </footer>
+
+    <script>
+        // Global State Management
+        let studentData = {
+            name: "",
+            class: "",
+            number: "",
+            date: new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+        };
+
+        let quizState = {
+            currentQuestion: 0,
+            answers: {},
+            score: 0,
+            correctCount: 0,
+            incorrectCount: 0,
+            isCompleted: false
+        };
+
+        let gameScores = {
+            g1: 0,
+            g2: 0,
+            g3: 0
+        };
+
+        let labObservation = {
+            material: "Besi",
+            l0: 1.0,
+            t1: 25,
+            t2: 100,
+            dt: 75,
+            alpha: 0.000012,
+            deltaL: 0.0009,
+            finalL: 1.0009
+        };
+
+        let reflectionData = {
+            ref1: "",
+            ref2: "",
+            ref3: "",
+            ref4: ""
+        };
+
+        let savedObservationsList = [];
+
+        // Quiz Questions Data (10 questions)
+        const quizQuestions = [
+            {
+                question: "1. Peristiwa bertambahnya ukuran panjang, luas, atau volume suatu benda karena mengalami kenaikan suhu disebut...",
+                options: ["A. Penyusutan", "B. Pemuaian", "C. Pencairan", "D. Penguapan"],
+                answer: 1,
+                explanation: "Pemuaian adalah bertambahnya ukuran benda akibat kenaikan suhu."
+            },
+            {
+                question: "2. Mengapa sambungan rel kereta api sengaja diberi celah atau renggangan?",
+                options: ["A. Agar kereta dapat berjalan lebih cepat", "B. Memberikan ruang pemuaian besi saat cuaca panas agar tidak melengkung", "C. Menghemat penggunaan besi rel", "D. Mencegah karat pada besi rel"],
+                answer: 1,
+                explanation: "Celah rel kereta api memberikan ruang bagi logam rel untuk memuai saat suhu panas di siang hari."
+            },
+            {
+                question: "3. Sebatang baja memiliki panjang awal 2 meter pada suhu 20°C. Jika dipanaskan hingga 120°C dengan koefisien muai panjang 0,000012 /°C, berapakah pertambahan panjangnya?",
+                options: ["A. 0,0012 meter", "B. 0,0024 meter", "C. 0,0048 meter", "D. 0,0240 meter"],
+                answer: 1,
+                explanation: "ΔL = L₀ × α × ΔT = 2 × 0,000012 × (120 - 20) = 2 × 0,000012 × 100 = 0,0024 meter."
+            },
+            {
+                question: "4. Zat cair mengalami pemuaian dalam bentuk...",
+                options: ["A. Pemuaian panjang saja", "B. Pemuaian luas saja", "C. Pemuaian volume", "D. Pemuaian massa jenis"],
+                answer: 2,
+                explanation: "Zat cair tidak memiliki bentuk tetap sehingga hanya mengalami pemuaian volume."
+            },
+            {
+                question: "5. Ketika air dalam panci dipanaskan terus-menerus hingga mendidih, kadang air tumpah keluar wadah. Hal ini membuktikan bahwa...",
+                options: ["A. Panci tidak ikut memuai", "B. Zat cair memuai lebih besar dibanding wadahnya", "C. Massa zat cair bertambah", "D. Suhu air mendidih tidak konstan"],
+                answer: 1,
+                explanation: "Zat cair memiliki koefisien muai volume yang umumnya lebih besar daripada zat padat (wadahnya)."
+            },
+            {
+                question: "6. Gas dapat mengalami pemuaian volume yang sangat besar karena...",
+                options: ["A. Jarak antar partikel gas sangat renggang dan gaya tarik antar partikel sangat kecil", "B. Partikel gas tidak memiliki massa", "C. Gas selalu berada di suhu tinggi", "D. Volume wadah gas selalu tetap"],
+                answer: 0,
+                explanation: "Partikel gas renggang dan bebas bergerak sehingga mudah mengalami ekspansi volume yang besar."
+            },
+            {
+                question: "7. Termometer raksa bekerja berdasarkan prinsip...",
+                options: ["A. Pemuaian zat padat pada logam kaca", "B. Pemuaian volume zat cair (raksa) di dalam pipa kapiler kaca", "C. Perubahan massa jenis raksa", "D. Pemuaian gas dalam bola termometer"],
+                answer: 1,
+                explanation: "Termometer raksa memanfaatkan prinsip pemuaian zat cair (raksa) ketika menerima panas."
+            },
+            {
+                question: "8. Perhatikan pernyataan berikut: (1) Pemasangan kabel listrik dibuat agak kendur pada siang hari, (2) Pemasangan bingkai jendela diberi celah, (3) Tutup botol logam yang rapat direndam air panas agar mudah dibuka. Penerapan pemuaian yang benar adalah...",
+                options: ["A. (1) dan (2) saja", "B. (2) dan (3) saja", "C. (1) dan (3) saja", "D. (1), (2), dan (3)"],
+                answer: 3,
+                explanation: "Kabel listrik dikendurkan saat siang/pemasangan agar tidak putus saat dingin (menyusut), bingkai jendela diberi celah untuk pemuaian, dan tutup botol direndam air panas agar tutup logam memuai lebih dulu sehingga longgar."
+            },
+            {
+                question: "9. Logam A memiliki koefisien muai panjang lebih besar daripada logam B. Jika kedua logam dengan panjang awal sama dipanaskan pada kenaikan suhu yang sama, maka...",
+                options: ["A. Logam B bertambah panjang lebih besar", "B. Logam A bertambah panjang lebih besar", "C. Pertambahan panjang kedua logam sama persis", "D. Logam A tidak mengalami pemuaian"],
+                answer: 1,
+                explanation: "Semakin besar koefisien muai panjang (α), semakin besar pula pertambahan panjang benda pada kenaikan suhu yang sama."
+            },
+            {
+                question: "10. Mengapa balon udara dapat terbang ke angkasa ketika udara di dalam balon dipanaskan menggunakan pembakar?",
+                options: ["A. Pemanasan membuat massa udara dalam balon bertambah berat", "B. Udara panas di dalam balon memuai sehingga massa jenisnya lebih kecil daripada udara luar, menyebabkan gaya angkat", "C. Pembakar menghasilkan gas beracun", "D. Balon udara menarik diri ke matahari"],
+                answer: 1,
+                explanation: "Udara yang dipanaskan akan memuai dan meregang, membuat massa jenisnya lebih ringan dari udara sekitar sehingga tercipta gaya angkat."
+            }
+        ];
+
+        // Daily life application cards data
+        const appCards = [
+            { title: "Celah Rel Kereta", desc: "Diberi celah agar saat cuaca panas besi tidak melengkung.", icon: "fa-train" },
+            { title: "Sambungan Jembatan", desc: "Dilengkapi pelat celah baja agar struktur tidak retak saat suhu berubah.", icon: "fa-bridge" },
+            { title: "Kabel Listrik", desc: "Dipasang agak kendur agar tidak putus saat menyusut di malam hari yang dingin.", icon: "fa-bolt" },
+            { title: "Termometer Ruangan", desc: "Memanfaatkan pemuaian zat cair (raksa/alkohol) dalam tabung.", icon: "fa-temperature-high" },
+            { title: "Tutup Botol Logam", desc: "Direndam air panas agar tutup logam memuai dan mudah dibuka.", icon: "fa-bottle-water" },
+            { title: "Bimetal Pengatur Suhu", desc: "Dua logam berbeda yang disatukan untuk saklar otomatis setrika/AC.", icon: "fa-microchip" }
+        ];
+
+        // Initialize App on Window Load
+        window.onload = function() {
+            checkExistingIdentity();
+            renderParticleCanvas('cold');
+            renderAppCards();
+            renderGames();
+            updateLabSimulation();
+        };
+
+        function checkExistingIdentity() {
+            const savedName = localStorage.getItem('ipa_student_name');
+            const savedClass = localStorage.getItem('ipa_student_class');
+            if (savedName && savedClass) {
+                studentData.name = savedName;
+                studentData.class = savedClass;
+                document.getElementById('display-name').innerText = savedName;
+                document.getElementById('identity-modal').classList.add('hidden');
+                updateLKPDIdentity();
+            }
+        }
+
+        function saveIdentity(event) {
+            event.preventDefault();
+            const name = document.getElementById('student-name').value.trim();
+            const className = document.getElementById('student-class').value.trim();
+            const number = document.getElementById('student-number').value.trim();
+
+            if (!name || !className) return;
+
+            studentData.name = name;
+            studentData.class = className;
+            studentData.number = number;
+
+            localStorage.setItem('ipa_student_name', name);
+            localStorage.setItem('ipa_student_class', className);
+
+            document.getElementById('display-name').innerText = name;
+            document.getElementById('identity-modal').classList.add('hidden');
+            updateLKPDIdentity();
+        }
+
+        function updateLKPDIdentity() {
+            document.getElementById('lkpd-name').value = studentData.name;
+            document.getElementById('lkpd-class').value = studentData.class;
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-50', 'text-blue-600', 'bg-orange-50', 'text-orange-600');
+                btn.classList.add('text-slate-600');
+            });
+
+            const activeBtn = document.querySelector(`[data-target="${tabId}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add(tabId === 'summary' ? 'bg-orange-50' : 'bg-blue-50', tabId === 'summary' ? 'text-orange-600' : 'text-blue-600');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (tabId === 'summary') refreshSummaryData();
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Particle Animation Simulation
+        function setParticleState(state) {
+            const btnCold = document.getElementById('btn-cold');
+            const btnHot = document.getElementById('btn-hot');
+            const desc = document.getElementById('particle-desc');
+
+            if (state === 'cold') {
+                btnCold.className = "px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold transition shadow-lg";
+                btnHot.className = "px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold transition hover:bg-slate-700";
+                desc.innerText = "Suhu rendah: Partikel bergetar rapat dan teratur di dalam wadah/benda.";
+                renderParticleCanvas('cold');
+            } else {
+                btnHot.className = "px-4 py-2 rounded-xl bg-orange-600 text-white text-xs font-bold transition shadow-lg";
+                btnCold.className = "px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold transition hover:bg-slate-700";
+                desc.innerText = "Suhu tinggi: Energi kinetik bertambah, partikel bergetar lebih cepat dan saling menjauh (memuai).";
+                renderParticleCanvas('hot');
+            }
+        }
+
+        function renderParticleCanvas(state) {
+            const container = document.getElementById('particle-container');
+            container.innerHTML = '';
+            const count = 25;
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div');
+                const size = state === 'hot' ? 'w-5 h-5' : 'w-4 h-4';
+                const bg = state === 'hot' ? 'bg-orange-500 animate-pulse' : 'bg-blue-500';
+                p.className = `absolute rounded-full ${size} ${bg} transition-all duration-500`;
+                
+                const spread = state === 'hot' ? 80 : 40;
+                const left = 50 + (Math.random() - 0.5) * spread;
+                const top = 50 + (Math.random() - 0.5) * spread;
+                p.style.left = `${left}%`;
+                p.style.top = `${top}%`;
+                container.appendChild(p);
+            }
+        }
+
+        // Render Application Cards
+        function renderAppCards() {
+            const grid = document.getElementById('app-cards-grid');
+            grid.innerHTML = appCards.map(c => `
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 hover:border-orange-300 transition group">
+                    <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition">
+                        <i class="fa-solid ${c.icon}"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 mb-1">${c.title}</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">${c.desc}</p>
+                </div>
+            `).join('');
+        }
+
+        // Deep Learning Checks
+        function checkPemantik() {
+            const radios = document.getElementsByName('pemantik-ans');
+            let selected = "";
+            for (let r of radios) { if (r.checked) selected = r.value; }
+            const feedback = document.getElementById('pemantik-feedback');
+            if (selected === 'b') {
+                feedback.className = "mt-2 text-xs font-semibold text-emerald-600";
+                feedback.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Benar sekali! Celah sambungan memberikan ruang muai bagi rel besi saat cuaca panas.';
+            } else {
+                feedback.className = "mt-2 text-xs font-semibold text-red-600";
+                feedback.innerHTML = '<i class="fa-solid fa-circle-xmark mr-1"></i> Kurang tepat. Coba pilih jawaban yang berkaitan dengan ruang pemuaian logam.';
+            }
+        }
+
+        function saveApplicationAnswer() {
+            const ans = document.getElementById('app-answer').value.trim();
+            const feedback = document.getElementById('app-feedback');
+            if (ans.length > 5) {
+                feedback.className = "text-xs font-semibold text-emerald-600 mt-2";
+                feedback.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Analisis berhasil disimpan!';
+            } else {
+                feedback.className = "text-xs font-semibold text-orange-600 mt-2";
+                feedback.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i> Mohon tuliskan analisis yang lebih lengkap.';
+            }
+        }
+
+        function saveReflection() {
+            reflectionData.ref1 = document.getElementById('ref-1').value;
+            reflectionData.ref2 = document.getElementById('ref-2').value;
+            reflectionData.ref3 = document.getElementById('ref-3').value;
+            reflectionData.ref4 = document.getElementById('ref-4').value;
+            document.getElementById('ref-feedback').innerText = "Catatan refleksi berhasil disimpan!";
+        }
+
+        // Virtual Lab Logic
+        const materialsData = {
+            iron: { name: "Besi", alpha: 0.000012 },
+            aluminum: { name: "Aluminium", alpha: 0.000024 },
+            copper: { name: "Tembaga", alpha: 0.000017 }
+        };
+
+        function updateLabSimulation() {
+            const matKey = document.getElementById('lab-material').value;
+            const l0 = parseFloat(document.getElementById('lab-l0').value) || 1.0;
+            const t1 = parseFloat(document.getElementById('lab-t1').value) || 25;
+            const t2 = parseFloat(document.getElementById('lab-t2').value) || 100;
+            const mat = materialsData[matKey];
+
+            const dt = t2 - t1;
+            const deltaL = l0 * mat.alpha * dt;
+            const finalL = l0 + deltaL;
+
+            labObservation = {
+                material: mat.name,
+                l0: l0,
+                t1: t1,
+                t2: t2,
+                dt: dt,
+                alpha: mat.alpha,
+                deltaL: parseFloat(deltaL.toFixed(5)),
+                finalL: parseFloat(finalL.toFixed(5))
+            };
+
+            document.getElementById('lab-temp-display').innerText = `Suhu: ${t2} °C`;
+            document.getElementById('res-dt').innerText = `${dt} °C`;
+            document.getElementById('res-alpha').innerText = mat.alpha;
+            document.getElementById('res-deltal').innerText = `${deltaL.toFixed(5)} m`;
+            document.getElementById('res-final').innerText = `${finalL.toFixed(5)} m`;
+
+            const barVisual = document.getElementById('metal-bar-visual');
+            const percentWidth = Math.min(85, Math.max(40, 50 + (deltaL * 2000)));
+            barVisual.style.width = `${percentWidth}%`;
+            barVisual.innerText = `${mat.name} (${finalL.toFixed(4)} m)`;
+            document.getElementById('visual-length-label').innerText = `Panjang Akhir: ${finalL.toFixed(4)} m`;
+        }
+
+        function resetLab() {
+            document.getElementById('lab-material').value = "iron";
+            document.getElementById('lab-l0').value = 1.0;
+            document.getElementById('lab-t1').value = 25;
+            document.getElementById('lab-t2').value = 100;
+            updateLabSimulation();
+        }
+
+        function saveLabObservation() {
+            savedObservationsList.push({ ...labObservation });
+            const tbody = document.getElementById('observation-table-body');
+            tbody.innerHTML = savedObservationsList.map(item => `
+                <tr>
+                    <td class="p-3 font-bold">${item.material}</td>
+                    <td class="p-3">${item.l0}</td>
+                    <td class="p-3">${item.t1}</td>
+                    <td class="p-3">${item.t2}</td>
+                    <td class="p-3">${item.dt}</td>
+                    <td class="p-3 text-orange-600 font-bold">${item.deltaL}</td>
+                    <td class="p-3 text-emerald-600 font-bold">${item.finalL}</td>
+                </tr>
+            `).join('');
+            document.getElementById('sum-lab-status').innerText = "Tersimpan (" + savedObservationsList.length + ")";
+        }
+
+        // Games Setup
+        const g1Data = [
+            { id: 1, text: "Celah sambungan rel kereta api", options: ["Pemuaian Zat Padat", "Pemuaian Zat Cair", "Pemuaian Gas"], correct: 0 },
+            { id: 2, text: "Permukaan air raksa naik pada termometer", options: ["Pemuaian Zat Padat", "Pemuaian Zat Cair", "Pemuaian Gas"], correct: 1 },
+            { id: 3, text: "Balon mengembang saat diletakkan di tempat panas", options: ["Pemuaian Zat Padat", "Pemuaian Zat Cair", "Pemuaian Gas"], correct: 2 }
+        ];
+
+        const g2Data = [
+            { id: 1, text: "Kasus: Tutup botol logam macet dan susah dibuka. Apa tindakan yang tepat?", options: ["Direndam air dingin agar menyusut", "Disiram air panas agar tutup logam memuai dan longgar", "Dipukul dengan palu besi"], correct: 1 },
+            { id: 2, text: "Kasus: Kabel PLN dipasang agak kendur saat siang hari panas. Tujuannya adalah...", options: ["Agar kabel tidak putus saat menyusut di malam hari dingin", "Agar burung bisa hinggap dengan nyaman", "Menambah hambatan listrik"], correct: 0 }
+        ];
+
+        const g3Data = [
+            { id: 1, text: "Semua jenis bahan logam memiliki koefisien muai panjang yang sama persis.", options: ["Benar", "Salah"], correct: 1 },
+            { id: 2, text: "Celah sambungan pada jembatan baja berfungsi untuk mengakomodasi perubahan panjang akibat suhu.", options: ["Benar", "Salah"], correct: 0 }
+        ];
+
+        function renderGames() {
+            document.getElementById('g1-questions').innerHTML = g1Data.map((q, i) => `
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                    <p class="text-xs font-bold text-slate-800">${i+1}. ${q.text}</p>
+                    <div class="flex flex-wrap gap-2">
+                        ${q.options.map((opt, oi) => `
+                            <label class="px-3 py-2 bg-white rounded-xl border border-slate-300 text-xs font-semibold cursor-pointer hover:bg-orange-50 transition">
+                                <input type="radio" name="g1-${i}" value="${oi}" class="mr-1"> ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('g2-questions').innerHTML = g2Data.map((q, i) => `
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                    <p class="text-xs font-bold text-slate-800">${q.text}</p>
+                    <div class="space-y-1">
+                        ${q.options.map((opt, oi) => `
+                            <label class="flex items-center gap-2 p-2 bg-white rounded-xl border border-slate-200 text-xs cursor-pointer hover:bg-orange-50">
+                                <input type="radio" name="g2-${i}" value="${oi}"> ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('g3-questions').innerHTML = g3Data.map((q, i) => `
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                    <p class="text-xs font-bold text-slate-800">${q.text}</p>
+                    <div class="flex gap-4">
+                        ${q.options.map((opt, oi) => `
+                            <label class="px-4 py-2 bg-white rounded-xl border border-slate-300 text-xs font-semibold cursor-pointer hover:bg-orange-50">
+                                <input type="radio" name="g3-${i}" value="${oi}"> ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function switchGame(num) {
+            for(let i=1; i<=3; i++) {
+                document.getElementById(`game-${i}-container`).classList.add('hidden');
+                document.getElementById(`g-tab-${i}`).className = "px-5 py-2.5 rounded-xl font-bold text-xs bg-slate-100 text-slate-700 hover:bg-slate-200";
+            }
+            document.getElementById(`game-${num}-container`).classList.remove('hidden');
+            document.getElementById(`g-tab-${num}`).className = "px-5 py-2.5 rounded-xl font-bold text-xs bg-orange-600 text-white shadow-md";
+        }
+
+        function submitGame1() {
+            let score = 0;
+            g1Data.forEach((q, i) => {
+                const radios = document.getElementsByName(`g1-${i}`);
+                for(let r of radios) { if(r.checked && parseInt(r.value) === q.correct) score += 33.3; }
+            });
+            gameScores.g1 = Math.round(score);
+            document.getElementById('g1-result').innerText = `Skor Game 1: ${gameScores.g1} / 100`;
+        }
+
+        function submitGame2() {
+            let score = 0;
+            g2Data.forEach((q, i) => {
+                const radios = document.getElementsByName(`g2-${i}`);
+                for(let r of radios) { if(r.checked && parseInt(r.value) === q.correct) score += 50; }
+            });
+            gameScores.g2 = Math.round(score);
+            document.getElementById('g2-result').innerText = `Skor Game 2: ${gameScores.g2} / 100`;
+        }
+
+        function submitGame3() {
+            let score = 0;
+            g3Data.forEach((q, i) => {
+                const radios = document.getElementsByName(`g3-${i}`);
+                for(let r of radios) { if(r.checked && parseInt(r.value) === q.correct) score += 50; }
+            });
+            gameScores.g3 = Math.round(score);
+            document.getElementById('g3-result').innerText = `Skor Game 3: ${gameScores.g3} / 100`;
+        }
+
+        // Quiz Logic
+        function startQuiz() {
+            document.getElementById('quiz-start-screen').classList.add('hidden');
+            document.getElementById('quiz-question-screen').classList.remove('hidden');
+            quizState.currentQuestion = 0;
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            const q = quizQuestions[quizState.currentQuestion];
+            document.getElementById('quiz-progress-badge').innerText = `Soal ${quizState.currentQuestion + 1} dari 10`;
+            document.getElementById('quiz-question-text').innerText = q.question;
+            
+            const container = document.getElementById('quiz-options-container');
+            container.innerHTML = q.options.map((opt, idx) => {
+                const isChecked = quizState.answers[quizState.currentQuestion] === idx ? 'checked' : '';
+                return `
+                    <label class="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50 transition">
+                        <input type="radio" name="quiz-opt" value="${idx}" ${isChecked} onchange="selectQuizOption(${idx})" class="text-indigo-600">
+                        <span class="text-sm font-medium text-slate-800">${opt}</span>
+                    </label>
+                `;
+            }).join('');
+
+            document.getElementById('btn-prev-quiz').disabled = quizState.currentQuestion === 0;
+            document.getElementById('btn-next-quiz').innerText = quizState.currentQuestion === quizQuestions.length - 1 ? "Selesaikan Kuis" : "Soal Berikutnya";
+        }
+
+        function selectQuizOption(idx) {
+            quizState.answers[quizState.currentQuestion] = idx;
+        }
+
+        function nextQuizQuestion() {
+            if (quizState.currentQuestion < quizQuestions.length - 1) {
+                quizState.currentQuestion++;
+                renderQuizQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function prevQuizQuestion() {
+            if (quizState.currentQuestion > 0) {
+                quizState.currentQuestion--;
+                renderQuizQuestion();
+            }
+        }
+
+        function finishQuiz() {
+            let correct = 0;
+            quizQuestions.forEach((q, idx) => {
+                if (quizState.answers[idx] === q.answer) correct++;
+            });
+            quizState.correctCount = correct;
+            quizState.incorrectCount = 10 - correct;
+            quizState.score = (correct / 10) * 100;
+            quizState.isCompleted = true;
+
+            document.getElementById('quiz-question-screen').classList.add('hidden');
+            document.getElementById('quiz-result-screen').classList.remove('hidden');
+            document.getElementById('final-score-display').innerText = quizState.score;
+            document.getElementById('score-detail-text').innerText = `Benar: ${correct} | Salah: ${10 - correct}`;
+        }
+
+        function retakeQuiz() {
+            quizState = { currentQuestion: 0, answers: {}, score: 0, correctCount: 0, incorrectCount: 0, isCompleted: false };
+            document.getElementById('quiz-result-screen').classList.add('hidden');
+            document.getElementById('quiz-start-screen').classList.remove('hidden');
+        }
+
+        function reviewQuiz() {
+            document.getElementById('quiz-result-screen').classList.add('hidden');
+            document.getElementById('quiz-review-screen').classList.remove('hidden');
+
+            const container = document.getElementById('quiz-review-container');
+            container.innerHTML = quizQuestions.map((q, idx) => {
+                const userAns = quizState.answers[idx];
+                const isCorrect = userAns === q.answer;
+                return `
+                    <div class="p-6 rounded-2xl border ${isCorrect ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'} space-y-2">
+                        <p class="font-bold text-sm text-slate-900">${q.question}</p>
+                        <p class="text-xs ${isCorrect ? 'text-emerald-700' : 'text-red-700'} font-semibold">
+                            Jawaban Anda: ${userAns !== undefined ? q.options[userAns] : 'Tidak dijawab'} ${isCorrect ? '✓' : '✗'}
+                        </p>
+                        <p class="text-xs text-slate-700 font-medium">Jawaban Benar: <strong>${q.options[q.answer]}</strong></p>
+                        <p class="text-xs text-slate-600 bg-white/60 p-3 rounded-xl border border-slate-200 mt-2"><strong>Pembahasan:</strong> ${q.explanation}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function backToQuizResult() {
+            document.getElementById('quiz-review-screen').classList.add('hidden');
+            document.getElementById('quiz-result-screen').classList.remove('hidden');
+        }
+
+        // LKPD Save
+        function saveLKPD() {
+            alertMsg("LKPD berhasil disimpan secara lokal!");
+        }
+
+        function alertMsg(txt) {
+            const div = document.createElement('div');
+            div.className = "fixed bottom-5 right-5 bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-xl z-50 text-xs font-bold animate-bounce";
+            div.innerText = txt;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+
+        // Summary & WhatsApp Integration
+        function refreshSummaryData() {
+            document.getElementById('sum-name').innerText = studentData.name || "Belum diisi";
+            document.getElementById('sum-class').innerText = "Kelas: " + (studentData.class || "-");
+            
+            if (quizState.isCompleted) {
+                document.getElementById('sum-quiz-score').innerText = quizState.score + " / 100";
+                document.getElementById('sum-quiz-detail').innerText = `Benar: ${quizState.correctCount} | Salah: ${quizState.incorrectCount}`;
+            } else {
+                document.getElementById('sum-quiz-score').innerText = "Belum Selesai";
+                document.getElementById('sum-quiz-detail').innerText = "0 benar dari 10 soal";
+            }
+
+            document.getElementById('sum-game-score').innerText = `G1: ${gameScores.g1} | G2: ${gameScores.g2} | G3: ${gameScores.g3}`;
+            document.getElementById('sum-lab-detail').innerText = `Bahan: ${labObservation.material} | ΔL: ${labObservation.deltaL} m`;
+
+            const pesan = `
+LAPORAN HASIL BELAJAR SISWA
+Mata Pelajaran: IPA Kelas 7
+Materi: Pemuaian Zat
+Nama Siswa: ${studentData.name || "Siswa"}
+Kelas: ${studentData.class || "-"}
+Tanggal: ${studentData.date}
+
+HASIL KUIS
+Jumlah Soal: 10
+Jawaban Benar: ${quizState.correctCount}
+Jawaban Salah: ${quizState.incorrectCount}
+Nilai Akhir: ${quizState.isCompleted ? quizState.score : 0}/100
+
+HASIL PERMAINAN
+Game 1: ${gameScores.g1}
+Game 2: ${gameScores.g2}
+Game 3: ${gameScores.g3}
+
+HASIL EKSPERIMEN
+Bahan: ${labObservation.material}
+Perubahan Suhu: ${labObservation.dt} °C
+Pertambahan Panjang: ${labObservation.deltaL} m
+
+KESIMPULAN SISWA
+${document.getElementById('lkpd-conclusion').value || "Belum diisi"}
+
+REFLEKSI
+${reflectionData.ref1 || "Belum diisi"}
+
+Sumber: Website Pembelajaran IPA Interaktif.
+            `.trim();
+
+            document.getElementById('whatsapp-preview-box').innerText = pesan;
+        }
+
+        function sendToWhatsAppGuru() {
+            if (!studentData.name || !studentData.class) {
+                alertMsg("Mohon isi identitas terlebih dahulu!");
+                switchTab('home');
+                return;
+            }
+            if (!quizState.isCompleted) {
+                alertMsg("Peringatan: Kuis belum diselesaikan! Harap selesaikan kuis terlebih dahulu.");
+                switchTab('quiz');
+                return;
+            }
+
+            const pesan = `
+LAPORAN HASIL BELAJAR SISWA
+Mata Pelajaran: IPA Kelas 7
+Materi: Pemuaian Zat
+Nama Siswa: ${studentData.name}
+Kelas: ${studentData.class}
+Tanggal: ${studentData.date}
+
+HASIL KUIS
+Jumlah Soal: 10
+Jawaban Benar: ${quizState.correctCount}
+Jawaban Salah: ${quizState.incorrectCount}
+Nilai Akhir: ${quizState.score}/100
+
+HASIL PERMAINAN
+Game 1: ${gameScores.g1}
+Game 2: ${gameScores.g2}
+Game 3: ${gameScores.g3}
+
+HASIL EKSPERIMEN
+Bahan: ${labObservation.material}
+Perubahan Suhu: ${labObservation.dt} °C
+Pertambahan Panjang: ${labObservation.deltaL} m
+
+KESIMPULAN SISWA
+${document.getElementById('lkpd-conclusion').value || "-"}
+
+REFLEKSI
+${reflectionData.ref1 || "-"}
+
+Sumber: Website Pembelajaran IPA Interaktif.
+            `.trim();
+
+            const nomorGuru = "6281373363236";
+            const url = `https://wa.me/${nomorGuru}?text=${encodeURIComponent(pesan)}`;
+            window.open(url, "_blank");
+        }
+    </script>
+</body>
+</html>
